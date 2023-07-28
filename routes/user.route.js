@@ -101,13 +101,9 @@ router.post('/login', async (req, res) => {
                     success:
                         false, message: 'Your account is inactive, Please contact your administrator'
                 })
-                const token = jwt.sign({
-                    iduser:
-                        user._id, name: user.firstname, role: user.role
-                }, process.env.SECRET, {
-                    expiresIn: "1h",
-                })
-                return res.status(200).send({ success: true, user, token })
+                const token = generateAccessToken(user);
+                const refreshToken = generateRefreshToken(user);
+                return res.status(200).send({ success: true, user, token, refreshToken })
             } else {
                 return res.status(404).send({
                     success: false, message:
@@ -119,6 +115,43 @@ router.post('/login', async (req, res) => {
         return res.status(404).send({
             success: false, message: err.message
         })
+    }
+});
+//Access Token
+const generateAccessToken = (user) => {
+    return jwt.sign({ iduser: user._id, role: user.role }, process.env.SECRET, {
+        expiresIn: '1600s'
+    })
+}
+// Refresh
+const generateRefreshToken = (user) => {
+    return jwt.sign({ iduser: user._id, role: user.role },
+        process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1y' })
+}
+//Refresh Route
+router.post('/refreshToken', async (req, res,) => {
+    console.log(req.body.refreshToken)
+    const refreshtoken = req.body.refreshToken;
+    if (!refreshtoken) {
+        return res.status(404).send({ success: false, message: 'Token Not Found' });
+    }
+    else {
+        jwt.verify(refreshtoken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            if (err) {
+                console.log(err)
+                return res.status(406).send({ success: false, message: 'Unauthorized' });
+            }
+            else {
+                const token = generateAccessToken(user);
+                const refreshToken = generateRefreshToken(user);
+                console.log("token-------", token);
+                res.status(200).send({
+                    success: true,
+                    token,
+                    refreshToken
+                })
+            }
+        });
     }
 });
 
