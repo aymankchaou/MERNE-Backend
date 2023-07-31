@@ -10,7 +10,7 @@ const register = require('./routes/user.route')
 dotenv.config()
 const app = express();
 const cors = require('cors')
-//BodyParser Middleware
+//BodyParser Middleware 
 app.use(express.json());
 mongoose.set("strictQuery", false);
 // Connexion à la base données  
@@ -18,7 +18,7 @@ mongoose.connect(process.env.DATABASECLOUD, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-    .then(() => {
+    .then(() => {      
         console.log("Connexion à la base de données réussie");
     }).catch(err => {
         console.log('Impossible de se connecter à la base de données', err);
