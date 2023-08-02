@@ -13,12 +13,14 @@ const cors = require('cors')
 //BodyParser Middleware 
 app.use(express.json());
 mongoose.set("strictQuery", false);
+// Initialize compression module
+const compression = require('compression');
 // Connexion à la base données  
 mongoose.connect(process.env.DATABASECLOUD, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-    .then(() => {      
+    .then(() => {
         console.log("Connexion à la base de données réussie");
     }).catch(err => {
         console.log('Impossible de se connecter à la base de données', err);
@@ -27,11 +29,13 @@ mongoose.connect(process.env.DATABASECLOUD, {
 app.get("/", (req, res) => {
     res.send("Bonjour a tous");
 });
+// Compress all HTTP responses
+app.use(compression());
 app.use(cors())
 app.use("/api/categories", categorieRouter)
 app.use("/api/scategories", scategorieRouter)
 app.use("/api/articles", articleRouter)
-app.use('/api/payment', paymentRouter); 
+app.use('/api/payment', paymentRouter);
 app.use('/api/user', register);
 
 

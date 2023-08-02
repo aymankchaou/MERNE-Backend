@@ -21,7 +21,9 @@ router.post('/', async (req, res) => {
 // afficher la liste des scategories.
 router.get('/', async (req, res) => {
     try {
-        const cat = await Scategorie.find({}, null, { sort: { '_id': -1 } })
+        const cat = await Scategorie.find({}, null, {
+            sort: { '_id': -1 }
+        }).populate("categorieID").exec();
         res.status(200).json(cat);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -63,6 +65,6 @@ router.put('/:scategorieId', async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 });
- 
-   
+
+
 module.exports = router   
